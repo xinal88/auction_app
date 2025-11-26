@@ -1,99 +1,180 @@
-#include "server.h"
-#include "handlers/logic_handler.h"
-#include "session_mgr.h"
-#include "../common/protocol.h"
-#include "../common/reliability.h"
-#include <pthread.h>
-#include <unistd.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <unistd.h>
+#include <pthread.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
-#include <arpa/inet.h>
-#include <stdint.h>
-#include <stddef.h>
+#include "protocol.h"
+#include "network_utils.h" 
 
-#define BACKLOG 10
+#define PORT 5500
+#define MAX_CLIENTS 100
 
-static int server_fd;
+// Cấu trúc để truyền vào thread
+typedef struct {
+    int sockfd;
+    struct sockaddr_in address;
+} client_t;
 
-void* client_thread(void* arg) {
-    int client_fd = (intptr_t)arg;
-    ClientSession* client = session_add_client(client_fd);
-    if (!client) {
-        close(client_fd);
-        return NULL;
-    }
 
-    Message msg;
+void *client_handler(void *arg) {
+    client_t *cli = (client_t *)arg;
+    int sockfd = cli->sockfd;
+    free(cli); // Giải phóng struct wrapper, chỉ giữ lại sockfd
+    
+    // Detach thread để tự giải phóng tài nguyên khi xong
+    pthread_detach(pthread_self());
+
+    PacketHeader header;
+    
     while (1) {
-        memset(&msg, 0, sizeof(msg));
-        ssize_t n = recv(client_fd, &msg, sizeof(MessageHeader), 0);
+        // BƯỚC A: Đọc Header trước
+        int n = recv_all(sockfd, &header, sizeof(PacketHeader));
         if (n <= 0) {
-            fprintf(stdout, "Client disconnected (fd=%d)\n", client_fd);
+            printf("Client %d disconnected.\n", sockfd);
             break;
         }
 
-        // Handle payload if exists
-        uint32_t payload_len = ntohl(msg.header.payload_length);
-        if (payload_len > 0 && payload_len <= BUFF_SIZE) {
-            ssize_t pn = recv(client_fd, msg.payload, payload_len, MSG_WAITALL);
-            if (pn != payload_len) {
-                fprintf(stderr, "Incomplete payload received\n");
+        // BƯỚC B: Dựa vào header.type để đọc tiếp Payload
+        switch (header.type) {
+            switch (header.type) {
+            // ==========================================
+            // GROUP 1: AUTHENTICATION (0x01-0x0F)
+            // ==========================================
+            case LOGIN_REQ:
+                handle_login(sockfd);
                 break;
-            }
-        }
+            case REGISTER_REQ:
+                handle_register(sockfd);
+                break;
+            case LOGOUT_REQ:
+                handle_logout(sockfd);
+                break;
 
-        // If client requires ACK, send one back
-        if (is_flag_set(msg.header.flags, FLAG_REQUIRES_ACK)) {
-            Message ack_msg = {0};
-            create_ack_message(&ack_msg, msg.header.request_id, msg.header.type);
-            send(client_fd, &ack_msg, sizeof(MessageHeader), 0);
-        }
+            // ==========================================
+            // GROUP 2: ACCOUNT MANAGEMENT (0x10-0x1F)
+            // ==========================================
+            case MONEY_REQ: // Deposit logic
+                handle_deposit(sockfd); 
+                break;
+            case REDEEM_REQ: // Withdraw logic
+                handle_redeem(sockfd);
+                break;
+            case VIEW_HISTORY_REQ:
+                handle_view_history(sockfd);
+                break;
 
-        // Process the message unless it's an ACK
-        if (!is_flag_set(msg.header.flags, FLAG_IS_ACK)) {
-            handle_client_message(client, &msg);
+            // ==========================================
+            // GROUP 3: OUTSIDE-ROOM ACTIONS (0x20-0x3F)
+            // ==========================================
+            case JOIN_ROOM_REQ:
+                handle_join_room(sockfd);
+                break;
+            case LEAVE_ROOM_REQ:
+                handle_leave_room(sockfd);
+                break;
+            case LIST_ROOMS_REQ:
+                handle_list_rooms(sockfd);
+                break;
+            case SEARCH_ITEM_REQ:
+                handle_search_item(sockfd);
+                break;
+            case CREATE_ROOM_REQ:
+                handle_create_room(sockfd);
+                break;
+
+            // ==========================================
+            // GROUP 4: IN-ROOM ACTIONS (0x40-0x5F)
+            // ==========================================
+            case VIEW_ITEMS_REQ:
+                handle_view_items(sockfd);
+                break;
+            case BID_REQ:
+                handle_bid(sockfd);
+                break;
+            case BUY_NOW_REQ:
+                handle_buy_now(sockfd);
+                break;
+            case CHAT_REQ:
+                handle_chat(sockfd);
+                break;
+            case CREATE_ITEM_REQ:
+                handle_create_item(sockfd);
+                break;
+            case DELETE_ITEM_REQ:
+                handle_delete_item(sockfd);
+                break;
+
+            default:
+                printf("Unknown message type\n");
         }
     }
 
-    session_remove_client(client_fd);
-    close(client_fd);
+    close(sockfd);
     return NULL;
 }
 
-bool server_start(uint16_t port) {
-    struct sockaddr_in addr = {
-        .sin_family = AF_INET,
-        .sin_port = htons(port),
-        .sin_addr.s_addr = INADDR_ANY
-    };
-
-    server_fd = socket(AF_INET, SOCK_STREAM, 0);
-    if (server_fd < 0) return false;
-
+int main() {
+    int server_fd, new_socket;
+    struct sockaddr_in address;
     int opt = 1;
-    setsockopt(server_fd, SOL_SOCKET, SO_REUSEADDR, &opt, sizeof(opt));
+    int addrlen = sizeof(address);
 
-    if (bind(server_fd, (struct sockaddr*)&addr, sizeof(addr)) < 0) {
-        close(server_fd);
-        return false;
+    // 1. Tạo socket
+    if ((server_fd = socket(AF_INET, SOCK_STREAM, 0)) == 0) {
+        perror("Socket creation failed");
+        exit(EXIT_FAILURE);
     }
 
-    if (listen(server_fd, BACKLOG) < 0) {
-        close(server_fd);
-        return false;
+    // 2. Gán options (Tránh lỗi "Address already in use")
+    if (setsockopt(server_fd, SOL_SOCKET, SO_REUSEADDR, &opt, sizeof(opt))) {
+        perror("Setsockopt failed");
+        exit(EXIT_FAILURE);
     }
 
-    printf("Server listening on port %d\n", port);
+    // 3. Bind địa chỉ
+    address.sin_family = AF_INET;
+    address.sin_addr.s_addr = INADDR_ANY;
+    address.sin_port = htons(PORT);
 
+    if (bind(server_fd, (struct sockaddr *)&address, sizeof(address)) < 0) {
+        perror("Bind failed");
+        exit(EXIT_FAILURE);
+    }
+
+    // 4. Listen
+    if (listen(server_fd, MAX_CLIENTS) < 0) {
+        perror("Listen failed");
+        exit(EXIT_FAILURE);
+    }
+
+    printf("Server is listening on port %d...\n", PORT);
+
+    // 5. Vòng lặp chấp nhận kết nối
     while (1) {
-        int client_fd = accept(server_fd, NULL, NULL);
-        if (client_fd < 0) continue;
+        struct sockaddr_in client_addr;
+        socklen_t client_len = sizeof(client_addr);
+        
+        // Block tại đây cho đến khi có client kết nối
+        new_socket = accept(server_fd, (struct sockaddr *)&client_addr, &client_len);
+        if (new_socket < 0) {
+            perror("Accept failed");
+            continue;
+        }
+
+        printf("New connection: Socket %d\n", new_socket);
+
+        // Tạo thread cho client mới
+        client_t *cli = malloc(sizeof(client_t));
+        cli->sockfd = new_socket;
+        cli->address = client_addr;
 
         pthread_t tid;
-        pthread_create(&tid, NULL, client_thread, (void*)(intptr_t)client_fd);
-        pthread_detach(tid);
+        if (pthread_create(&tid, NULL, client_handler, (void*)cli) != 0) {
+            perror("Thread creation failed");
+            free(cli);
+        }
     }
+    return 0;
 }

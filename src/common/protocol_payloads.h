@@ -5,20 +5,35 @@
 
 
 // Auth
+
 typedef struct __attribute__((packed)) {
     char username[50];
-    char password[50];  // Send hashed in practice!
-} LoginReq;  // Also usable for RegisterReq
+    char password[50];
+    char email[100];       
+    char bank_account[50]; 
+    char bank_name[100];    
+} RegisterReq;
+
+typedef struct __attribute__((packed)) {
+    int32_t status;
+    char message[100];
+} RegisterRes;
+
+
+typedef struct __attribute__((packed)) {
+    char username[50];
+    char password[50]; 
+} LoginReq;  
 
 typedef struct __attribute__((packed)) {
     int32_t status;
     char message[100];
     uint32_t user_id;
-    char session_token[64];  // For session persistence and reconnects
-} LoginRes;  // Also for RegisterRes
+    char session_token[64];  
+} LoginRes;  
 
 typedef struct __attribute__((packed)) {
-    char session_token[64];  // To validate logout
+    char session_token[64];  
 } LogoutReq;
 
 typedef struct __attribute__((packed)) {
@@ -28,24 +43,24 @@ typedef struct __attribute__((packed)) {
 
 // Account Management
 typedef struct __attribute__((packed)) {
-    int64_t amount;  // in VND
-} DepositReq;  // Also for RedeemReq
+    int64_t amount; 
+} MoneyReq;  
 
 typedef struct __attribute__((packed)) {
     int32_t status;
     char message[100];
-    int64_t new_balance;  // Updated balance after transaction
-} DepositRes;  // Also for RedeemRes
+    int64_t new_balance;  
+} MoneyRes;  // Also for RedeemRes
+
 
 typedef struct __attribute__((packed)) {
-    // Empty, or add filters like date range if needed
+
 } ViewHistoryReq;
 
 typedef struct __attribute__((packed)) {
     int32_t status;
     char message[100];
-    uint16_t count;  // Number of history entries following
-    // Followed by count * HistoryEntry in payload
+    uint16_t count;  
 } ViewHistoryRes;
 
 // Outside-Room Actions
@@ -61,14 +76,13 @@ typedef struct __attribute__((packed)) {
 } CreateRoomRes;
 
 typedef struct __attribute__((packed)) {
-    char query[100];  // Optional search filter, empty for all
+    char query[100];  
 } ListRoomsReq;
 
 typedef struct __attribute__((packed)) {
     int32_t status;
     char message[100];
-    uint16_t count;  // Number of rooms following
-    // Followed by count * RoomInfo
+    uint16_t count;  
 } ListRoomsRes;
 
 typedef struct __attribute__((packed)) {
@@ -78,29 +92,25 @@ typedef struct __attribute__((packed)) {
 typedef struct __attribute__((packed)) {
     int32_t status;
     char message[100];
-    uint16_t count;  // Number of items
-    // Followed by count * ItemInfo
+    uint16_t count;  
 } SearchItemRes;
 
 typedef struct __attribute__((packed)) {
     uint32_t room_id;
-} JoinRoomReq;  // Also for LeaveRoomReq
-
+} JoinRoomReq;  
 typedef struct __attribute__((packed)) {
     int32_t status;
     char message[100];
-} JoinRoomRes;  // Also for LeaveRoomRes
+} JoinRoomRes;  
 
 // In-Room Actions
 typedef struct __attribute__((packed)) {
-    // Empty if room implicit, or uint32_t room_id
 } ViewItemsReq;
 
 typedef struct __attribute__((packed)) {
     int32_t status;
     char message[100];
     uint16_t count;
-    // Followed by count * ItemInfo
 } ViewItemsRes;
 
 typedef struct __attribute__((packed)) {
@@ -131,6 +141,8 @@ typedef struct __attribute__((packed)) {
 
 typedef struct __attribute__((packed)) {
     char text[256];
+    uint32_t user_id;
+    uint32_t room_id;
 } ChatReq;
 
 typedef struct __attribute__((packed)) {
@@ -143,8 +155,8 @@ typedef struct __attribute__((packed)) {
     char name[100];
     char description[256];
     int64_t start_price;
-    int64_t buy_now_price;  // 0 if no buy now
-    uint32_t duration_sec;  // Auction duration
+    int64_t buy_now_price;  
+    uint32_t duration_sec;  
 } CreateItemReq;
 
 typedef struct __attribute__((packed)) {
@@ -175,4 +187,23 @@ typedef struct __attribute__((packed)) {
     int64_t final_price;
 } ItemSold;
 
+
+
+
+typedef struct __attribute__((packed)) {
+    uint32_t room_id;
+    char room_name[100];
+    char description[256];
+} RoomInfo;
+
+typedef struct __attribute__((packed)) {
+    uint32_t item_id;
+    uint32_t room_id;
+    char item_name[255];
+    char description[256];
+    int64_t current_price;
+    int64_t buy_now_price;
+    uint32_t remaining_sec; // Thời gian còn lại
+    char status[50];        // 'scheduled', 'active', 'sold'...
+} ItemInfo;
 #endif
