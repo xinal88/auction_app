@@ -5,7 +5,11 @@
 #include <time.h>
 #include <inttypes.h>
 
-static Database db = {0};
+Database db = {0};
+
+PGconn* db_get_connection(void) {
+    return db.conn;
+}
 
 bool db_init(const char* conninfo)
 {

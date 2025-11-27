@@ -1,0 +1,82 @@
+# Makefile for Auction Server (Windows)
+
+CC = gcc
+CFLAGS = -Wall -Wextra -I. -DWIN32
+LDFLAGS = -lws2_32 -lpq
+
+# Directories
+SRC_DIR = src
+SERVER_DIR = $(SRC_DIR)/server
+COMMON_DIR = $(SRC_DIR)/common
+BUILD_DIR = build
+
+# Source files
+SERVER_SRCS = $(SERVER_DIR)/main.c \
+              $(SERVER_DIR)/server.c \
+              $(SERVER_DIR)/handlers.c \
+              $(SERVER_DIR)/session_manager.c \
+              $(SERVER_DIR)/db_adapter.c \
+              $(SERVER_DIR)/db_adapter_extra.c \
+              $(SERVER_DIR)/auction_timer.c \
+              $(COMMON_DIR)/utils.c
+
+# Object files
+SERVER_OBJS = $(patsubst %.c,$(BUILD_DIR)/%.o,$(notdir $(SERVER_SRCS)))
+
+# Target executable
+SERVER_TARGET = auction_server.exe
+
+.PHONY: all clean server
+
+all: server
+
+server: $(BUILD_DIR) $(SERVER_TARGET)
+
+$(BUILD_DIR):
+	if not exist $(BUILD_DIR) mkdir $(BUILD_DIR)
+
+$(SERVER_TARGET): $(SERVER_OBJS)
+	$(CC) $(SERVER_OBJS) -o $@ $(LDFLAGS)
+	@echo Server built successfully: $(SERVER_TARGET)
+
+# Compile server files
+$(BUILD_DIR)/main.o: $(SERVER_DIR)/main.c
+	$(CC) $(CFLAGS) -c $< -o $@
+
+$(BUILD_DIR)/server.o: $(SERVER_DIR)/server.c
+	$(CC) $(CFLAGS) -c $< -o $@
+
+$(BUILD_DIR)/handlers.o: $(SERVER_DIR)/handlers.c
+	$(CC) $(CFLAGS) -c $< -o $@
+
+$(BUILD_DIR)/session_manager.o: $(SERVER_DIR)/session_manager.c
+	$(CC) $(CFLAGS) -c $< -o $@
+
+$(BUILD_DIR)/db_adapter.o: $(SERVER_DIR)/db_adapter.c
+	$(CC) $(CFLAGS) -c $< -o $@
+
+$(BUILD_DIR)/db_adapter_extra.o: $(SERVER_DIR)/db_adapter_extra.c
+	$(CC) $(CFLAGS) -c $< -o $@
+
+$(BUILD_DIR)/auction_timer.o: $(SERVER_DIR)/auction_timer.c
+	$(CC) $(CFLAGS) -c $< -o $@
+
+$(BUILD_DIR)/utils.o: $(COMMON_DIR)/utils.c
+	$(CC) $(CFLAGS) -c $< -o $@
+
+clean:
+	if exist $(BUILD_DIR) rmdir /s /q $(BUILD_DIR)
+	if exist $(SERVER_TARGET) del /q $(SERVER_TARGET)
+	@echo Cleaned build files
+
+run: server
+	$(SERVER_TARGET)
+
+.PHONY: help
+help:
+	@echo Auction Server Makefile (Windows)
+	@echo ==================================
+	@echo make          - Build server
+	@echo make server   - Build server
+	@echo make clean    - Remove build files
+	@echo make run      - Build and run server

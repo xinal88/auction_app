@@ -38,4 +38,11 @@ bool db_update_item_winner(int32_t item_id, int32_t winner_id, int64_t final_pri
 bool db_add_transaction(int32_t user_id, int64_t amount_vnd, const char* type, int32_t related_item_id, const char* status);
 bool db_get_user_history(int32_t user_id, PGresult** res);
 
+// Search
+bool db_search_items(const char* search_term, PGresult** res);
+bool db_delete_item(int32_t item_id);
+
+// Utility
+PGconn* db_get_connection(void);
+
 #endif

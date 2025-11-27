@@ -45,10 +45,11 @@ typedef enum {
     CREATE_ITEM_RES,
     DELETE_ITEM_REQ,
     DELETE_ITEM_RES,
-    TIMER_UPDATE  
-    ITEM_SOLD           
+    TIMER_UPDATE,
+    ITEM_SOLD,
 
     // Server status & error (0xF0-0xFF)
+    ERROR_RES = 0xF0
 
 } MessageType;
 
