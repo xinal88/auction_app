@@ -21,10 +21,11 @@ int main(int argc, char *argv[]) {
     qDebug() << "Connecting to server at" << serverHost << ":" << serverPort;
     
     if (!networkClient->connectToServer(serverHost, serverPort)) {
-        QMessageBox::critical(nullptr, "Connection Error", 
+        QMessageBox::warning(nullptr, "Connection Error", 
             "Failed to connect to server at " + serverHost + ":" + QString::number(serverPort) + 
-            "\n\nPlease make sure the server is running.");
-        return 1;
+            "\n\nPlease make sure the server is running.\n\nContinuing anyway for UI testing...");
+        // Don't exit - continue to show UI for testing
+        // return 1;
     }
     
     qDebug() << "Connected to server successfully";

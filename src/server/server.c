@@ -152,7 +152,7 @@ int server_main() {
     LOG_INFO("Timer manager started");
     
     // Initialize database
-    const char *conninfo = "dbname=auction_db user=postgres";
+    const char *conninfo = "dbname=auction_db user=postgres password=''";
     if (!db_init(conninfo)) {
         LOG_ERROR("Failed to connect to database");
         return 1;

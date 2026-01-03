@@ -1,288 +1,234 @@
-# 🎯 ỨNG DỤNG ĐẤU GIÁ TRỰC TUYẾN
+# 🔨 AuctionHub - Online Auction Application
 
-> **Network Programming Project - HUST**
+Modern Qt-based auction application with real-time bidding, chat, and PostgreSQL database integration.
 
-Ứng dụng đấu giá trực tuyến với kiến trúc Client-Server, hỗ trợ đấu giá real-time, chat, và quản lý tài chính.
+## 📋 Features
 
----
+### Core Features
+- ✅ **User Management**: Register, Login, Profile management
+- ✅ **Money Management**: Deposit, Withdraw, Bank information
+- ✅ **Auction Rooms**: Create, Join, Browse with search and filters
+- ✅ **Real-time Bidding**: Place bids with validation and balance checking
+- ✅ **Buy Now**: Instant purchase option
+- ✅ **Live Chat**: Real-time messaging in auction rooms
+- ✅ **Countdown Timer**: Visual timer for each auction
+- ✅ **Activity History**: Transaction logs and bid history
+- ✅ **Image Support**: Load product images from URLs
+
+### Technical Features
+- Modern Qt 6 UI with custom styling
+- PostgreSQL database integration
+- Real-time data updates
+- Responsive layout
+- Demo mode (works without database)
+- Error handling and validation
 
 ## 🚀 Quick Start
 
+### Prerequisites
+- Qt 6.x (tested with 6.10.1)
+- MinGW or MSVC compiler
+- PostgreSQL 12+ (optional for full features)
+
+### Build & Run
+
+#### Windows
 ```bash
-# 1. Setup database (2 phút)
-sudo service postgresql start
-sudo -u postgres psql -f data/create_user.sql
-sudo -u postgres createdb -O trung auction_db
-psql -U trung -d auction_db -f data/schema.sql
-psql -U trung -d auction_db -f data/data.sql
-
-# 2. Build và chạy server (1 phút)
-make clean && make server
-./auction_server
-
-# 3. Build và chạy client (2 phút) - Terminal mới
-qmake auction_client.pro && make
-./auction_client
-
-# 4. Login với: alice / pass123
+# 1. Open Qt Creator
+# 2. Open elite_auction_final.pro
+# 3. Build (Ctrl+B)
+# 4. Run (Ctrl+R)
 ```
 
-**Chi tiết**: Xem [QUICK_START.md](QUICK_START.md)
+#### Database Setup (Optional)
+```bash
+# 1. Create database
+createdb -U postgres auction_db
 
----
+# 2. Run schema
+psql -U postgres -d auction_db -f data/schema.sql
 
-## ✨ Tính năng chính
+# 3. Load demo data
+psql -U postgres -d auction_db -f data/data.sql
 
-### ✅ Đấu giá Real-time
-- Đặt giá (bid) với validation ≥10,000 VND
-- Mua ngay (buy now)
-- **Timer với 30s warning và auto-reset** ⭐
-- Real-time notifications
-
-### ✅ Quản lý Phòng
-- Tạo/Join/Leave phòng
-- Mỗi user chỉ ở 1 phòng
-- Liệt kê phòng active
-
-### ✅ Quản lý Tài chính
-- Deposit/Redeem money
-- Transaction history
-- Balance tracking
-
-### ✅ Chat
-- Chat trong phòng
-- Broadcast to all members
-- Timestamp + sender name
-
-### ✅ Bảo mật
-- Session token authentication
-- SQL injection prevention
-- Access control
-
----
-
-## 🏗️ Kiến trúc
-
-```
-┌─────────────┐         ┌─────────────┐
-│   Client    │◄───────►│   Server    │
-│   (Qt/C++)  │  TCP    │   (C)       │
-└─────────────┘  5500   └──────┬──────┘
-                                │
-                         ┌──────▼──────┐
-                         │ PostgreSQL  │
-                         └─────────────┘
+# 4. Update password in elite_main_window.cpp line 25
 ```
 
-**Server**: Multi-threaded C với timer system  
-**Client**: Qt GUI với real-time updates  
-**Protocol**: Binary protocol tùy chỉnh  
-**Database**: PostgreSQL với 8 tables  
+Or use pgAdmin 4 GUI - see `SETUP_USING_PGADMIN.md`
 
----
-
-## 📊 Điểm số
-
-| Tiêu chí | Điểm | Status |
-|----------|------|--------|
-| Tính năng cơ bản | 21/21 | ✅ |
-| Timer + Reset | 2/2 | ✅ |
-| Tính năng nâng cao | 10/10 | ✅ |
-| Giao diện đồ họa | 3/3 | ✅ |
-| **TỔNG** | **36/33** | **✅** |
-
----
-
-## 📁 Cấu trúc
+## 📁 Project Structure
 
 ```
 auction_app/
+├── elite_*.cpp/h           # Elite UI source files
+├── elite_auction_final.pro # Qt project file
+├── data/
+│   ├── schema.sql         # Database schema
+│   └── data.sql           # Demo data
 ├── src/
-│   ├── server/          # Server C code (8 files)
-│   ├── client/          # Client Qt code (8 files)
-│   └── common/          # Shared protocol (5 files)
-├── data/                # Database scripts
-├── Makefile             # Server build
-├── auction_client.pro   # Qt project
-└── docs/                # Documentation (7 files)
+│   ├── server/            # C server implementation
+│   └── client_cli/        # CLI client
+├── docs/                  # Documentation
+└── README.md
 ```
 
-**Code**: ~3,500 lines  
-**Documentation**: ~1,850 lines  
+## 🎯 Usage
 
----
+### 1. Login/Register
+- Click "Sign up" to create account
+- Or login with existing credentials
+- Demo mode: any credentials work
+
+### 2. Explore Auctions
+- Browse auction rooms
+- Search by name
+- Filter by Live/Upcoming status
+- Click room to join
+
+### 3. Bidding
+- Enter bid amount (min: current + 10,000 đ)
+- Click "Place Bid"
+- Or use quick bid buttons (+50K, +100K, +500K)
+
+### 4. Buy Now
+- Click "Buy Now" button
+- Confirm purchase
+- Balance deducted automatically
+
+### 5. Manage Money
+- Go to Account page
+- Deposit: Add funds to balance
+- Withdraw: Remove funds (requires bank info)
+- Update bank information
+
+### 6. Chat
+- Type message in chat box
+- Click send or press Enter
+- Messages saved to database
+
+## 🗄️ Database Schema
+
+### Main Tables
+- **users**: User accounts and balances
+- **auction_rooms**: Auction room information
+- **auction_items**: Items for auction
+- **bids**: Bid history
+- **chat_messages**: Chat logs
+- **activity_logs**: Transaction history
+
+See `data/schema.sql` for complete schema.
 
 ## 📚 Documentation
 
-| File | Mô tả |
-|------|-------|
-| [QUICK_START.md](QUICK_START.md) | Hướng dẫn nhanh 5 phút |
-| [SETUP_GUIDE.md](SETUP_GUIDE.md) | Setup chi tiết |
-| [BUILD.md](BUILD.md) | Build instructions |
-| [FEATURES.md](FEATURES.md) | Danh sách tính năng |
-| [TIMER_FEATURE.md](TIMER_FEATURE.md) | Chi tiết timer system ⭐ |
-| [PROJECT_SUMMARY.md](PROJECT_SUMMARY.md) | Tổng quan dự án |
-| [PRE_DEMO_CHECKLIST.md](PRE_DEMO_CHECKLIST.md) | Checklist trước demo |
-| [README_FINAL.md](README_FINAL.md) | Tài liệu đầy đủ |
+- `BACKEND_HOAN_CHINH.md` - Complete backend documentation (Vietnamese)
+- `CAI_TIEN_HOAN_CHINH.md` - UI improvements documentation (Vietnamese)
+- `SETUP_USING_PGADMIN.md` - Database setup with pgAdmin
+- `HUONG_DAN_CHAY_ELITE_QT.md` - Running guide (Vietnamese)
+- `QUICK_START_ELITE.md` - Quick start guide
 
----
+## 🛠️ Development
 
-## 🎯 Tính năng nổi bật
-
-### 1. Auction Timer System ⭐
-
-```
-60s → 30s → ⚠️ WARNING → 25s → BID → ⏱️ RESET to 30s
-```
-
-- Timer countdown tự động
-- Gửi thông báo 30 giây cuối
-- **Auto-reset về 30s khi có bid mới**
-- Tự động xác định winner
-
-**Chi tiết**: [TIMER_FEATURE.md](TIMER_FEATURE.md)
-
-### 2. Real-time Notifications
-
-- `BID_NOTIFY`: Bid mới
-- `TIMER_UPDATE`: Countdown (mỗi 5s)
-- `CHAT_NOTIFY`: Tin nhắn chat
-- `ITEM_SOLD`: Item đã bán
-
-### 3. Multi-threaded Server
-
-- 1 thread per client
-- Dedicated timer thread
-- Thread-safe session management
-- Mutex protection
-
----
-
-## 🧪 Test
-
-### Test accounts
-
-| Username | Password | Balance |
-|----------|----------|---------|
-| alice | pass123 | 50,000,000 VND |
-| bob | pass123 | 30,000,000 VND |
-| charlie | pass123 | 15,000,000 VND |
-
-### Test scenario: Timer Reset
-
-1. Alice tạo item (60s)
-2. Bob join room
-3. Đợi đến 25s
-4. Bob bid → **Timer reset to 30s** ✅
-5. Đợi đến 20s
-6. Alice bid → **Timer reset to 30s** ✅
-7. Đợi hết → Item sold
-
----
-
-## 🔧 Requirements
-
-### Server
-- GCC compiler
-- PostgreSQL 12+
-- libpq-dev
-- pthread
-
-### Client
-- Qt 5.12+ hoặc Qt 6.x
-- Qt Creator (khuyến nghị)
-- C++ compiler
-
----
-
-## 📝 Logs
-
+### Build from Source
 ```bash
-# Server log
-tail -f server.log
-
-# Client log
-tail -f client.log
+qmake elite_auction_final.pro
+make
 ```
 
----
-
-## 🐛 Troubleshooting
-
-### Server không start
-```bash
-sudo service postgresql start
-sudo lsof -i :5500
+### Database Connection
+Edit `elite_main_window.cpp` line 25:
+```cpp
+db->connectToDatabase("localhost", "auction_db", "postgres", "YOUR_PASSWORD");
 ```
 
-### Client không connect
-```bash
-ps aux | grep auction_server
-telnet localhost 5500
-```
+### Demo Mode
+App works without database connection:
+- Uses demo data
+- All UI features functional
+- No data persistence
 
-### Database error
-```bash
-dropdb -U trung auction_db
-createdb -U trung auction_db
-psql -U trung -d auction_db -f data/schema.sql
-psql -U trung -d auction_db -f data/data.sql
-```
+## 🎨 UI Components
 
-**Chi tiết**: [SETUP_GUIDE.md](SETUP_GUIDE.md#troubleshooting)
+- **Login Window**: Modern authentication UI
+- **Main Window**: Browse and search rooms
+- **Auction Room**: Live bidding interface
+- **Account Window**: Profile and money management
+- **Dialogs**: Deposit, Withdraw, Bank info, Create room, Sign up
 
----
+## 🔧 Troubleshooting
 
-## 🎓 Technologies
+### Database Connection Failed
+1. Check PostgreSQL is running
+2. Verify database exists: `psql -U postgres -l`
+3. Check password in code
+4. Ensure libpq.dll is in PATH
 
-- **Server**: C, pthread, libpq, BSD sockets
-- **Client**: C++, Qt5/6, QTcpSocket
-- **Database**: PostgreSQL
-- **Protocol**: Binary (custom)
-- **Build**: Make, qmake
+### Build Errors
+1. Clean build folder
+2. Run qmake again
+3. Check Qt version (6.x required)
+4. Verify all source files present
 
----
+### UI Issues
+1. Check Qt modules: widgets, network, sql
+2. Verify stylesheet syntax
+3. Check image URLs are accessible
 
-## 📞 Support
+## 📝 Requirements
 
-- **Logs**: `server.log`, `client.log`
-- **Database**: `/var/log/postgresql/`
-- **Network**: `telnet localhost 5500`
+From `yêu cầu project.txt`:
+- ✅ User management and authentication
+- ✅ Create and join auction rooms
+- ✅ Item management with queue
+- ✅ Real-time bidding with validation
+- ✅ Buy now functionality
+- ✅ Chat in rooms
+- ✅ Timer with 30-second warning
+- ✅ Transaction logging
+- ✅ Activity history
+- ✅ Search and filter
+- ✅ Deposit/Withdraw money
+- ✅ Bank information management
 
----
+## 🤝 Contributing
 
-## 🎉 Status
-
-✅ **HOÀN THÀNH 100%**
-
-- ✅ Tất cả tính năng cơ bản
-- ✅ Timer với 30s warning và auto-reset
-- ✅ Tính năng nâng cao
-- ✅ Giao diện đồ họa
-- ✅ Documentation đầy đủ
-- ✅ Sẵn sàng demo
-
----
+This is a university project. For improvements:
+1. Fork the repository
+2. Create feature branch
+3. Commit changes
+4. Push to branch
+5. Create Pull Request
 
 ## 📄 License
 
-Educational project for Network Programming course at HUST.
+University project - HUST (Hanoi University of Science and Technology)
+
+## 👥 Authors
+
+- Student project for Network Programming course
+- Qt 6 + PostgreSQL implementation
+- Modern UI/UX design
+
+## 🎓 Academic Use
+
+This project demonstrates:
+- Socket programming concepts
+- Database integration
+- Real-time communication
+- Modern UI development
+- Client-server architecture
 
 ---
 
-## 👥 Contributors
+**Note**: This is an educational project. Not for production use without proper security audits.
 
-- **Student**: [Your Name]
-- **Course**: Network Programming
-- **University**: HUST
-- **Year**: 2024
+## 📞 Support
+
+For issues or questions:
+1. Check documentation in `docs/` folder
+2. Review troubleshooting section
+3. Check database connection
+4. Verify Qt installation
 
 ---
 
-**Chúc bạn demo thành công! 🚀**
-
-*For detailed information, see [README_FINAL.md](README_FINAL.md)*
-# auction_app
-# auction_app
-# auction_app
-# auction_app
+Made with ❤️ using Qt 6 and PostgreSQL

@@ -1,0 +1,55 @@
+# Qt
+*.pro.user
+*.pro.user.*
+*.qmake.stash
+*.autosave
+moc_*.cpp
+moc_*.h
+qrc_*.cpp
+ui_*.h
+Makefile*
+*.o
+*.obj
+
+# Build directories
+build/
+build-*/
+debug/
+release/
+
+# Compiled binaries
+*.exe
+*.dll
+*.so
+*.dylib
+auction_client
+auction_client_cli
+auction_server
+
+# Logs
+*.log
+
+# IDE
+.qtcreator/
+.vscode/
+.idea/
+
+# Temporary files
+*~
+*.swp
+*.swo
+.DS_Store
+Thumbs.db
+
+# Database
+*.db
+*.sqlite
+
+# Backup files
+*.bak
+*.backup
+*_backup.*
+
+# Old/unused files
+-p/
+*.asta.lock

@@ -30,6 +30,9 @@ CREATE TABLE auction_rooms (
     room_name VARCHAR(255) NOT NULL,
     created_by INT NOT NULL,
     description TEXT,
+    status VARCHAR(50) DEFAULT 'active' CHECK (status IN ('active', 'upcoming', 'ended')),
+    participant_count INT DEFAULT 0,
+    image_url VARCHAR(500),
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (created_by) REFERENCES users(user_id) ON DELETE CASCADE
 );
@@ -49,6 +52,7 @@ CREATE TABLE auction_items (
     status VARCHAR(50) DEFAULT 'scheduled' CHECK (status IN ('scheduled', 'active', 'available', 'sold', 'cancelled')),
     created_by INT NOT NULL,
     queue_position INT,
+    image_url VARCHAR(500),
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (room_id) REFERENCES auction_rooms(room_id) ON DELETE CASCADE,
     FOREIGN KEY (created_by) REFERENCES users(user_id) ON DELETE CASCADE

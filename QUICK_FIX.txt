@@ -1,0 +1,44 @@
+========================================
+QUICK FIX - Build Error
+========================================
+
+Lỗi đã được sửa!
+
+Làm theo 3 bước sau trong Qt Creator:
+
+BƯỚC 1: Clean
+--------------
+Build → Clean All
+
+BƯỚC 2: Run qmake
+-----------------
+Build → Run qmake
+
+BƯỚC 3: Rebuild
+---------------
+Build → Rebuild All (Ctrl + Shift + B)
+
+BƯỚC 4: Run
+-----------
+Build → Run (Ctrl + R)
+
+========================================
+
+Nếu vẫn lỗi, thử:
+1. Đóng Qt Creator
+2. Xóa file auction_app.pro.user
+3. Mở lại Qt Creator
+4. Open Project: auction_app.pro
+5. Configure lại
+6. Build
+
+========================================
+
+Hoặc dùng command line:
+
+del Makefile
+qmake auction_app.pro
+mingw32-make
+bin\AuctionHub.exe
+
+========================================

@@ -17,31 +17,43 @@ VALUES
 -- ============================
 -- Insert Auction Rooms
 -- ============================
-INSERT INTO auction_rooms (room_name, created_by, description)
+INSERT INTO auction_rooms (room_name, created_by, description, status, participant_count, image_url)
 VALUES
-('Electronics Auction', 1, 'Phones, laptops, gadgets'),
-('Luxury Items', 2, 'Jewelry and watches'),
-('Vintage Collection', 3, 'Antiques and collectibles');
+('Luxury Watches Auction', 1, 'Premium collection of luxury timepieces', 'active', 12, 'https://images.unsplash.com/photo-1523170335258-f5ed11844a49'),
+('Vintage Electronics', 2, 'Classic tech collectibles from the 80s and 90s', 'upcoming', 8, 'https://images.unsplash.com/photo-1550009158-9ebf69173e03'),
+('Art & Collectibles', 3, 'Rare art pieces and limited edition collectibles', 'active', 15, 'https://images.unsplash.com/photo-1561214115-f2f134cc4912'),
+('Rare Books Collection', 1, 'First editions and signed copies', 'upcoming', 6, 'https://images.unsplash.com/photo-1512820790803-83ca734da794'),
+('Designer Fashion', 2, 'Luxury clothing and accessories', 'active', 20, 'https://images.unsplash.com/photo-1490481651871-ab68de25d43d');
 
 -- ============================
--- Insert Items (corrected status values)
+-- Insert Items (with images)
 -- ============================
-INSERT INTO auction_items (room_id, item_name, description, starting_price, current_price, buy_now_price, auction_duration, status, created_by, queue_position)
+INSERT INTO auction_items (room_id, item_name, description, starting_price, current_price, buy_now_price, auction_duration, status, created_by, queue_position, image_url)
 VALUES
--- Room 1: Electronics
-(1, 'iPhone 15', 'Brand new phone', 8000000, 9500000, 12000000, 1800, 'sold', 1, 1),
-(1, 'MacBook Air M2', 'Lightweight laptop', 9000000, 10000000, 15000000, 1800, 'active', 1, 2),
-(1, 'Samsung Galaxy S23', 'High-end Android phone', 7000000, 7800000, NULL, 1800, 'available', 2, 3),
+-- Room 1: Luxury Watches
+(1, 'Rolex Submariner', 'Vintage 1960s Rolex Submariner in excellent condition', 50000000, 75000000, 120000000, 3600, 'active', 1, 1, 'https://images.unsplash.com/photo-1523170335258-f5ed11844a49'),
+(1, 'Omega Speedmaster', 'Classic moonwatch with original box and papers', 30000000, 30000000, 45000000, 3600, 'available', 1, 2, 'https://images.unsplash.com/photo-1614164185128-e4ec99c436d7'),
+(1, 'Patek Philippe Calatrava', 'Elegant dress watch in 18K gold', 80000000, 80000000, 150000000, 3600, 'available', 1, 3, 'https://images.unsplash.com/photo-1587836374828-4dbafa94cf0e'),
+(1, 'Rolex Daytona', 'Rare Paul Newman dial, collector\'s item', 150000000, 150000000, 250000000, 3600, 'available', 1, 4, 'https://images.unsplash.com/photo-1622434641406-a158123450f9'),
 
--- Room 2: Luxury Items
-(2, 'Rolex Submariner', 'Luxury watch', 50000000, 80000000, 80000000, 3600, 'sold', 3, 1),
-(2, 'Diamond Ring', '18K gold diamond ring', 20000000, 25000000, 35000000, 3600, 'sold', 4, 2),
-(2, 'Cartier Bracelet', 'Gold bracelet', 15000000, 16000000, NULL, 3600, 'available', 5, 3),
+-- Room 2: Vintage Electronics
+(2, 'Apple Macintosh 128K', 'Original 1984 Macintosh in working condition', 8000000, 8000000, 15000000, 3600, 'available', 2, 1, 'https://images.unsplash.com/photo-1587831990711-23ca6441447b'),
+(2, 'Sony Walkman TPS-L2', 'First generation Walkman from 1979', 3000000, 3000000, 5000000, 3600, 'available', 2, 2, 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e'),
+(2, 'Nintendo Game Boy', 'Original 1989 Game Boy with games', 2000000, 2000000, 4000000, 3600, 'available', 2, 3, 'https://images.unsplash.com/photo-1531525645387-7f14be1bdbbd'),
 
--- Room 3: Vintage Collection
-(3, 'Vintage Camera', 'Film camera from 1970s', 3000000, 4000000, 6000000, 3600, 'sold', 6, 1),
-(3, 'Old Painting', '19th century art piece', 5000000, 6500000, NULL, 3600, 'sold', 7, 2),
-(3, 'Antique Vase', 'Porcelain vase', 2000000, 3200000, NULL, 3600, 'sold', 8, 3);
+-- Room 3: Art & Collectibles
+(3, 'Limited Edition Print', 'Signed lithograph by famous artist', 15000000, 15000000, 25000000, 3600, 'available', 3, 1, 'https://images.unsplash.com/photo-1561214115-f2f134cc4912'),
+(3, 'Vintage Vinyl Collection', 'Rare Beatles first pressings', 10000000, 10000000, 18000000, 3600, 'available', 3, 2, 'https://images.unsplash.com/photo-1603048588665-791ca8aea617'),
+(3, 'Antique Sculpture', 'Bronze sculpture from 19th century', 25000000, 25000000, 40000000, 3600, 'available', 3, 3, 'https://images.unsplash.com/photo-1578926078164-61a39d3a4f4e'),
+
+-- Room 4: Rare Books
+(4, 'First Edition Harry Potter', 'Philosopher\'s Stone first print', 50000000, 50000000, 80000000, 3600, 'available', 1, 1, 'https://images.unsplash.com/photo-1512820790803-83ca734da794'),
+(4, 'Signed Hemingway Novel', 'The Old Man and the Sea, signed', 30000000, 30000000, 50000000, 3600, 'available', 1, 2, 'https://images.unsplash.com/photo-1544947950-fa07a98d237f'),
+
+-- Room 5: Designer Fashion
+(5, 'Hermès Birkin Bag', 'Rare crocodile leather Birkin 35', 200000000, 200000000, 350000000, 3600, 'available', 2, 1, 'https://images.unsplash.com/photo-1584917865442-de89df76afd3'),
+(5, 'Chanel Classic Flap', 'Vintage Chanel double flap bag', 80000000, 80000000, 120000000, 3600, 'available', 2, 2, 'https://images.unsplash.com/photo-1590874103328-eac38a683ce7'),
+(5, 'Louis Vuitton Trunk', 'Antique steamer trunk from 1920s', 60000000, 60000000, 100000000, 3600, 'available', 2, 3, 'https://images.unsplash.com/photo-1566150905458-1bf1fc113f0d');
 
 -- ============================
 -- Insert User Rooms (One room per user constraint)
